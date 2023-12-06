@@ -9,8 +9,7 @@ lines.each do |l|
   nums << "#{temp[0]}#{temp[-1]}"
 end
 
-nums.map!(&:to_i)
-puts nums.sum
+p nums.map!(&:to_i).sum
 
 # Part 2
 nums = []
