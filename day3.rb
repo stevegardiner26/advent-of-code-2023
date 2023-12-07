@@ -45,4 +45,46 @@ puts part_num_sum
 
 # Part 2
 
-# Reverse the search to look for * instead of digits and then search for digits in prev and post to confirm. Then take proper gear calculations. *BUT WE NEED THE DIGIT INDEXES TO GET THE NUM*
+lines = input.split(/\n/)
+total_sum = 0
+lines.each_with_index do |line, index|
+  next unless line.match(/\*/)
+
+  indexes = (0 ... line.length).find_all { |i| line[i,1] == '*' }
+
+  indexes.each do |index_of|
+    matches = []
+    line.enum_for(:scan, /\d+/).each do |match|
+      start_i = Regexp.last_match.begin(0)
+      end_i = Regexp.last_match.end(0) - 1
+      matches << match.to_i if start_i - 1 == index_of || end_i + 1 == index_of
+    end
+
+    unless index == 0
+      prev_line = lines[index - 1]
+      prev_line.enum_for(:scan, /\d+/).each do |match|
+        start_i = Regexp.last_match.begin(0)
+        end_i = Regexp.last_match.end(0) - 1
+        index_range = (index_of == 0 ? index_of : index_of - 1)..(index_of == prev_line.length ? index_of : index_of + 1)
+        matches << match.to_i if index_range.include?(start_i) || index_range.include?(end_i)
+      end
+    end
+
+    unless index == lines.length
+      post_line = lines[index + 1]
+      post_line.enum_for(:scan, /\d+/).each do |match|
+        start_i = Regexp.last_match.begin(0)
+        end_i = Regexp.last_match.end(0) - 1
+        index_range = (index_of == 0 ? index_of : index_of - 1)..(index_of == prev_line.length ? index_of : index_of + 1)
+        matches << match.to_i if index_range.include?(start_i) || index_range.include?(end_i)
+      end
+    end
+
+    if matches.count == 2
+      # Is a gear
+      total_sum += matches[0] * matches[1]
+    end
+  end
+end
+
+p total_sum
